@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+pandoc -f epub -t plain -o "${1/.epub/.txt}" "$1"
+echo "Converted $1 to ${1/.epub/.txt}"
