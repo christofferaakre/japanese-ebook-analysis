@@ -3,4 +3,5 @@ __pycache__
 .env
 data
 *.ipynb
-books
+static/books
+uploads
