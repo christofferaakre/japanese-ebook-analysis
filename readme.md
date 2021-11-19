@@ -39,3 +39,15 @@ for a good guide on how to set it up.
 4. Install other dependencies (these all need to be in your system path):
     * `pandoc`
 5. Run `./app.py` to start the flask dev server
+
+## Contributing
+I'm very happy for any happy contributions! Before contributing, please
+have a look at
+[CONTRIBUTING.md](https://github.com/christofferaakre/japanese-ebook-analysis/blob/master/CONTRIBUTING.md)
+To see what needs work on, have a look at the repo's
+[Issues](https://github.com/christofferaakre/japanese-ebook-analysis/issues)
+and its
+[Pull requests](https://github.com/christofferaakre/japanese-ebook-analysis/pulls).
+Feel free to submit your own issue or pull request about a new feature or anything
+else. When submitting a pull request, don't be afraid to modify any of the files;
+I'm not very attached to the coding style used in the repo.
