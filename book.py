@@ -63,6 +63,9 @@ def analyse_epub(filename: str) -> object:
     words_with_uses = sorted([(word, words.count(word)) for word in unique_words], key=lambda tup: tup[1], reverse=True)
     used_once = [word for word, uses in words_with_uses if uses == 1]
 
+    word_list = [{"word": word, "ocurrences": occurences} for word, occurences in words_with_uses]
+    char_list = [{"character": char, "occurences": occurences} for char, occurences in chars_with_uses]
+
     book_data = {
         'title': title,
         'authors': authors,
@@ -72,11 +75,15 @@ def analyse_epub(filename: str) -> object:
         'n_words_used_once': len(used_once),
         'n_chars': len(chars),
         'n_chars_unique': len(unique_chars),
-        'n_chars_used_once': len(chars_used_once)
+        'n_chars_used_once': len(chars_used_once),
+        'words': word_list,
+        'chars': char_list,
+        'file_hash': file_hash
     }
 
-
-    with open(f'{book_dir}/book_data.json', 'w', encoding='utf-8') as file:
+    json_filename = f'{book_dir}/book_data.json'
+    with open(json_filename, 'w', encoding='utf-8') as file:
             json.dump(book_data, file)
+    print(f'wrote data to {json_filename}')
 
     return book_data

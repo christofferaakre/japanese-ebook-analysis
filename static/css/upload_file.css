@@ -1,0 +1,21 @@
+@font-face {
+    font-family: 'Roboto';
+    src: url("{{ url_for('static', filename='fonts/Roboto/Roboto-Regular.ttf')}}").format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+* {
+    font-family: 'Roboto', sans-serif;
+}
+
+
+body {
+    color: #212121;
+    background-color: #FEFCF2;
+}
+
+.buttons-container input {
+    display: block;
+    margin-top: 15px;
+}

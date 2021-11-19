@@ -1,0 +1,47 @@
+
+
+.books {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.book{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.title{
+    margin-bottom: 5px;
+}
+
+.author {
+    margin-bottom: 5px;
+}
+
+.cover-image {
+    height: 200px;
+}
+
+.book-container {
+    display: flex;
+}
+
+.info-container {
+    margin-left: 25px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.info {
+    margin-bottom: 5px;
+}
+
+.value {
+    font-weight: bold;
+}
