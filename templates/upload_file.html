@@ -1,0 +1,15 @@
+<!doctype html>
+<head>
+    <title>Upload new File</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/upload_file.css')}}">
+</head>
+<body>
+    {% include "header.html" %}
+    <h1>Upload new File</h1>
+    <form method="post" action=/upload enctype=multipart/form-data>
+        <div class="buttons-container">
+          <input type=file name=file>
+          <input type=submit value=Upload>
+        </div>
+    </form>
+</body>

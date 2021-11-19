@@ -15,6 +15,10 @@ def get_all_subdirs(path: str) -> list:
     return [x for x in p.iterdir() if x.is_dir()]
 
 def get_books() -> list:
+    """
+    Returns a list of the data for all the
+    analysed ebooks
+    """
     book_dirs = get_all_subdirs('static/books')
     books = []
     for book_dir in book_dirs:
@@ -25,6 +29,12 @@ def get_books() -> list:
     return books
 
 def get_book(hash: str) -> object:
+    """
+    Returns the data for the book with the given hash.
+    Arguments:
+    hash: str - The sha256 sum hash for the epub file
+    """
+
     with open(f'static/books/{hash}/book_data.json') as file:
         book_data = json.load(file)
         return book_data

@@ -11,13 +11,14 @@
     <title>Book Analaysis</title>
 </head>
 <body>
+    {% include "header.html" %}
     <ul class="books">
     {% for book in books %}
     <li class="book">
         <h2 class="title">{{book.title}}</h2>
         <span class="author">{{book.authors|join(', ')}}</span>
         <div class="book-container">
-        <img class="cover-image" src={{book.image}} />
+        <img class="cover-image" src="{{ url_for('static', filename='../' + book.image)}}"/>
         <div class="info-container">
             <span class="info">Length of book in words:
                 <span class="value">
