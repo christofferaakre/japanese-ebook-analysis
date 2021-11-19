@@ -43,11 +43,13 @@ for a good guide on how to set it up.
 ## Contributing
 I'm very happy for any happy contributions! Before contributing, please
 have a look at
-[CONTRIBUTING.md](https://github.com/christofferaakre/japanese-ebook-analysis/blob/master/CONTRIBUTING.md)
+[CONTRIBUTING.md](https://github.com/christofferaakre/japanese-ebook-analysis/blob/master/CONTRIBUTING.md).<br>
+
 To see what needs work on, have a look at the repo's
 [Issues](https://github.com/christofferaakre/japanese-ebook-analysis/issues)
 and its
-[Pull requests](https://github.com/christofferaakre/japanese-ebook-analysis/pulls).
+[Pull requests](https://github.com/christofferaakre/japanese-ebook-analysis/pulls).<br>
+
 Feel free to submit your own issue or pull request about a new feature or anything
 else. When submitting a pull request, don't be afraid to modify any of the files;
 I'm not very attached to the coding style used in the repo.
