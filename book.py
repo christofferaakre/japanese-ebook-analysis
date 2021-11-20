@@ -30,7 +30,7 @@ def analyse_epub(filename: str) -> object:
     filename: str - The path to the .epub file to analyse
     """
     file_hash = sha256sum(filename)
-    book_dir = f'books/{file_hash}'
+    book_dir = f'static/books/{file_hash}'
     subprocess.run(f'mkdir -p {book_dir}', shell=True)
 
     mt = MeCab.Tagger('-r /dev/null -d /usr/lib/mecab/dic/mecab-ipadic-neologd/')

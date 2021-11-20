@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+{% include "header.html" %}
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
@@ -11,7 +12,6 @@
     <title>Book Analaysis</title>
 </head>
 <body>
-    {% include "header.html" %}
     <ul class="books">
     {% for book in books %}
     <li class="book">
