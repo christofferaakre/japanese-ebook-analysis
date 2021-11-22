@@ -4,9 +4,12 @@ import MeCab
 import epub_meta
 from utils import save_base64_image, convert_epub_to_txt, process_japanese_text, parse_sentence, remove_ruby_text_from_epub
 
+from pathlib import Path
 import hashlib
 import mmap
 import json
+
+from constants import UPLOAD_FOLDER
 
 def sha256sum(filename: str) -> str:
     """
@@ -20,14 +23,17 @@ def sha256sum(filename: str) -> str:
             h.update(mm)
     return h.hexdigest()
 
-def analyse_epub(filename: str) -> object:
+def analyse_ebook(filename: str, fallback_title: str = 'Book Title') -> object:
     """
-    Analayse a .epub file containing japanese text, determining various things
+    Analayse a ebook containing japanese text, determining various things
     like the length of the book in words/characters, the number of unique
     words and characters used, and the number of words and characters that
     are used once only. Returns and object containing this information.
     Arguments:
-    filename: str - The path to the .epub file to analyse
+    filename: str - The path to the file to analyse
+    fallback_title: str (optional) - Optionally, you can pass a fallback title.
+    If function can't figure out what the ebook you passed is called, it
+    will use this as the book title
     """
     file_hash = sha256sum(filename)
     book_dir = f'static/books/{file_hash}'
@@ -35,18 +41,36 @@ def analyse_epub(filename: str) -> object:
 
     mt = MeCab.Tagger('-r /dev/null -d /usr/lib/mecab/dic/mecab-ipadic-neologd/')
 
+    book_path = filename
+    extension = filename.split('.')[-1]
 
-    book_path = remove_ruby_text_from_epub(filename, new_filename=f"{book_dir}/no-furigana.epub")
+    if extension == 'epub':
+        book_path = remove_ruby_text_from_epub(filename, new_filename=f"{book_dir}/no-furigana.epub")
 
-    book = epub_meta.get_epub_metadata(book_path)
+    book = {}
+    if extension == 'epub':
+        book = epub_meta.get_epub_metadata(book_path)
+    elif extension == 'txt':
+        book = {
+                'title': fallback_title,
+                'authors': '',
+                'cover_image_content': '',
+                }
 
     title = book['title']
     authors = book['authors']
     cover_image = book['cover_image_content']
+    image_path = ''
 
-    image_path = save_base64_image(cover_image, f'{book_dir}/musume.jpg')
+    txt_file = ''
 
-    txt_file = convert_epub_to_txt(book_path, process_text=True)
+    if extension == 'epub':
+        image_path = save_base64_image(cover_image, f'{book_dir}/musume.jpg')
+        txt_file = convert_epub_to_txt(book_path, process_text=True)
+
+    elif extension == 'txt':
+        image_path = ''
+        txt_file = filename
 
     with open(txt_file, 'r', encoding='utf-8') as file:
         text = file.read()
@@ -86,4 +110,25 @@ def analyse_epub(filename: str) -> object:
             json.dump(book_data, file)
     print(f'wrote data to {json_filename}')
 
+    clean_dir(book_dir, keep_extensions=['.json', '.jpg', '.png'])
+    clean_dir(UPLOAD_FOLDER)
+
     return book_data
+
+def clean_dir(directory: str, keep_extensions: list = None) -> None:
+    """
+    Delete all the files in the given directory, keeping
+    the files that have one of the extesnsions given in
+    keep_extensions. Returns None
+    Arguments:
+    directory: str - Path to the directory you want to clean
+    keep_extensions: list - List of the extensions you want to keep.
+    For example, ['.json', '.jpg', '.png']
+    """
+    if not keep_extensions:
+        keep_extensions = []
+    for f in Path(directory).glob("*"):
+        if f.is_file():
+            extension = f.suffix
+            if not extension in keep_extensions:
+                f.unlink()

@@ -16,9 +16,15 @@
     {% for book in books %}
     <li class="book">
         <h2 class="title">{{book.title}}</h2>
-        <span class="author">{{book.authors|join(', ')}}</span>
+        {% if book.title %}
+            <span class="author">{{book.authors|join(', ')}}</span>
+            {% else %}
+                <span class="author">Author: N/A</span>
+        {% endif %}
         <div class="book-container">
-        <img class="cover-image" src="{{ url_for('static', filename='../' + book.image)}}"/>
+            {% if book.image | length > 2 %}
+                <img class="cover-image" src="{{ url_for('static', filename='../' + book.image)}}"/>
+            {% endif %}
         <div class="info-container">
             <span class="info">Length of book in words:
                 <span class="value">

@@ -22,7 +22,11 @@ For text processing, we use [MeCab](https://taku910.github.io/mecab/)
 Currently, the project is not deployed anywhere, so to use the service,
 you will need to follow the steps below in the development section to
 get the server running.
-1. Upload a `.epub` file containing japanese text to the server
+1. Upload a file containing japanese text to the server. Currently allowed
+file formats:
+* `.epub`
+* `.txt` with utf-8 encoding. If you have a `.txt` file with different encoding,
+there are many ways to change the encoding. I use this: https://github.com/Frederick-S/aozora-bunko-utf8
 2. The server will redirect you to a page showing you information about the ebook.
 You can then also click the 'See more details' button to see all the generated
 data, including a list of all the words used together with how many occurences there

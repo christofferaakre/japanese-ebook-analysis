@@ -5,11 +5,10 @@ from flask import Flask, flash, request, redirect, url_for, jsonify
 from flask.templating import render_template
 from werkzeug.utils import secure_filename
 
-from book import analyse_epub
+from book import analyse_ebook
 from utils import get_books, get_book
 
-UPLOAD_FOLDER = 'uploads'
-ALLOWED_EXTENSIONS = {'txt', 'epub'}
+from constants import UPLOAD_FOLDER, ALLOWED_EXTENSIONS
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -55,7 +54,7 @@ def upload_ebook():
         filename = secure_filename(file.filename)
         save_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(save_path)
-        book_data = analyse_epub(save_path)
+        book_data = analyse_ebook(save_path, fallback_title=filename)
         file_hash = book_data['file_hash']
         return redirect(f'/books/{file_hash}')
 
