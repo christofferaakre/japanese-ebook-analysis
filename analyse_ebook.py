@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import sys
-from book import analyse_ebook
+from book_utils import analyse_ebook
 
 print(sys.argv)
 assert len(sys.argv) == 2, "Usage: ./analyse_ebook.py filename"

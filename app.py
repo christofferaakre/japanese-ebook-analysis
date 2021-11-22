@@ -5,7 +5,7 @@ from flask import Flask, flash, request, redirect, url_for, jsonify
 from flask.templating import render_template
 from werkzeug.utils import secure_filename
 
-from book import analyse_ebook
+from book_utils import analyse_ebook
 from utils import get_books, get_book
 
 from constants import UPLOAD_FOLDER, ALLOWED_EXTENSIONS
