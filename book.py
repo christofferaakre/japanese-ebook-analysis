@@ -1,8 +1,10 @@
-from re import S
+import re
 import subprocess
 import MeCab
 import epub_meta
 from utils import save_base64_image, convert_epub_to_txt, process_japanese_text, parse_sentence, remove_ruby_text_from_epub
+
+import regex
 
 from Book import Book
 
@@ -76,6 +78,21 @@ def process_epub(filename: str, book_dir: str, file_hash: str) -> Book:
             )
     return book
 
+# TODO: make this work. It currently doesn't
+# work
+def remove_furigana(text: str) -> str:
+    furigana = [
+            ('(', ')'),
+            ('[', ']'),
+            #('《', '》'),
+            ('（', '）'),
+            ]
+    no_furigana = text
+    for start, end in furigana:
+            reg = fr'{((?:[^{start}{end}]|(?R))*)}'
+            no_furigana = regex.sub(reg, '', no_furigana)
+    return no_furigana
+
 def process_txt(filename: str, book_dir: str, file_hash: str) -> Book:
     """
     Takes a .txt file and returns a Book object.
@@ -84,6 +101,7 @@ def process_txt(filename: str, book_dir: str, file_hash: str) -> Book:
     book_dir: str - The directory the book is in
     file_hash: str - The sha256sum hash of the file
     """
+
     extension = '.' + filename.split('.')[-1]
     title = filename.split('/')[-1].replace(extension, '')
     book = Book(path=filename,
