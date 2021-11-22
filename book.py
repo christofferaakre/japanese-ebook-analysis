@@ -4,6 +4,8 @@ import MeCab
 import epub_meta
 from utils import save_base64_image, convert_epub_to_txt, process_japanese_text, parse_sentence, remove_ruby_text_from_epub
 
+from Book import Book
+
 from pathlib import Path
 import hashlib
 import mmap
@@ -23,7 +25,77 @@ def sha256sum(filename: str) -> str:
             h.update(mm)
     return h.hexdigest()
 
-def analyse_ebook(filename: str, fallback_title: str = 'Book Title') -> object:
+def process_file(filename: str) -> Book:
+    """
+    Process the given ebook file and returns a Book
+    object describing it. The Book object contains various
+    fields like the author, title, cover image, etc. as well
+    as the path to a generated .txt file (regardless of input extension)
+    that has been processed to allow for easy analysis
+    Arguments:
+    filename: str - The path to the file
+    """
+    allowed_extensions = ['epub', 'txt']
+    extension = filename.split('.')[-1]
+
+    file_hash = sha256sum(filename)
+    book_dir = f'static/books/{file_hash}'
+    subprocess.run(f'mkdir -p {book_dir}', shell=True)
+
+    if extension == 'epub':
+        return process_epub(filename, book_dir=book_dir, file_hash=file_hash)
+    elif extension == 'txt':
+        return process_txt(filename, book_dir=book_dir, file_hash=file_hash)
+    else:
+        raise ValueError(f'Filename extension must be one of {",".join(allowed_extensions)}')
+
+def process_epub(filename: str, book_dir: str, file_hash: str) -> Book:
+    """
+    Takes an epub file and returns a Book object.
+    Arguments:
+    filename: str - The path to the epub file
+    book_dir: str - The directory the book is in
+    file_hash: str - The sha256sum hash of the file
+    """
+    book_path = remove_ruby_text_from_epub(filename,
+                                            new_filename=f"{book_dir}/no-furigana.epub")
+    book_metadata = epub_meta.get_epub_metadata(book_path)
+    title = book_metadata['title']
+    authors = book_metadata['authors']
+    image = book_metadata['cover_image_content']
+
+    image_path = save_base64_image(image, f'{book_dir}/cover-image.jpg')
+    txt_file = convert_epub_to_txt(book_path, process_text=True)
+
+    book = Book(path=txt_file,
+            title=title,
+            authors=authors,
+            image=image_path,
+            file_hash=file_hash,
+            book_dir=book_dir
+            )
+    return book
+
+def process_txt(filename: str, book_dir: str, file_hash: str) -> Book:
+    """
+    Takes a .txt file and returns a Book object.
+    Arguments:
+    filename: str - The path to the .txt file
+    book_dir: str - The directory the book is in
+    file_hash: str - The sha256sum hash of the file
+    """
+    extension = '.' + filename.split('.')[-1]
+    title = filename.split('/')[-1].replace(extension, '')
+    book = Book(path=filename,
+            title=title,
+            authors=[],
+            image='',
+            file_hash=file_hash,
+            book_dir=book_dir
+            )
+    return book
+
+def analyse_ebook(filename: str) -> object:
     """
     Analayse a ebook containing japanese text, determining various things
     like the length of the book in words/characters, the number of unique
@@ -31,48 +103,12 @@ def analyse_ebook(filename: str, fallback_title: str = 'Book Title') -> object:
     are used once only. Returns and object containing this information.
     Arguments:
     filename: str - The path to the file to analyse
-    fallback_title: str (optional) - Optionally, you can pass a fallback title.
-    If function can't figure out what the ebook you passed is called, it
-    will use this as the book title
     """
-    file_hash = sha256sum(filename)
-    book_dir = f'static/books/{file_hash}'
-    subprocess.run(f'mkdir -p {book_dir}', shell=True)
 
     mt = MeCab.Tagger('-r /dev/null -d /usr/lib/mecab/dic/mecab-ipadic-neologd/')
+    book = process_file(filename)
 
-    book_path = filename
-    extension = filename.split('.')[-1]
-
-    if extension == 'epub':
-        book_path = remove_ruby_text_from_epub(filename, new_filename=f"{book_dir}/no-furigana.epub")
-
-    book = {}
-    if extension == 'epub':
-        book = epub_meta.get_epub_metadata(book_path)
-    elif extension == 'txt':
-        book = {
-                'title': fallback_title,
-                'authors': '',
-                'cover_image_content': '',
-                }
-
-    title = book['title']
-    authors = book['authors']
-    cover_image = book['cover_image_content']
-    image_path = ''
-
-    txt_file = ''
-
-    if extension == 'epub':
-        image_path = save_base64_image(cover_image, f'{book_dir}/musume.jpg')
-        txt_file = convert_epub_to_txt(book_path, process_text=True)
-
-    elif extension == 'txt':
-        image_path = ''
-        txt_file = filename
-
-    with open(txt_file, 'r', encoding='utf-8') as file:
+    with open(book.path, 'r', encoding='utf-8') as file:
         text = file.read()
 
     # Analysing characters
@@ -91,9 +127,9 @@ def analyse_ebook(filename: str, fallback_title: str = 'Book Title') -> object:
     char_list = [{"character": char, "occurences": occurences} for char, occurences in chars_with_uses]
 
     book_data = {
-        'title': title,
-        'authors': authors,
-        'image': image_path,
+        'title': book.title,
+        'authors': book.authors,
+        'image': book.image,
         'n_words': len(words),
         'n_words_unique': len(unique_words),
         'n_words_used_once': len(used_once),
@@ -102,15 +138,15 @@ def analyse_ebook(filename: str, fallback_title: str = 'Book Title') -> object:
         'n_chars_used_once': len(chars_used_once),
         'words': word_list,
         'chars': char_list,
-        'file_hash': file_hash
+        'file_hash': book.file_hash
     }
 
-    json_filename = f'{book_dir}/book_data.json'
+    json_filename = f'{book.book_dir}/book_data.json'
     with open(json_filename, 'w', encoding='utf-8') as file:
             json.dump(book_data, file)
     print(f'wrote data to {json_filename}')
 
-    clean_dir(book_dir, keep_extensions=['.json', '.jpg', '.png'])
+    clean_dir(book.book_dir, keep_extensions=['.json', '.jpg', '.png'])
     clean_dir(UPLOAD_FOLDER)
 
     return book_data
