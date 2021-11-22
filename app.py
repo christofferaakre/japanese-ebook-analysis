@@ -54,7 +54,7 @@ def upload_ebook():
         filename = secure_filename(file.filename)
         save_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(save_path)
-        book_data = analyse_ebook(save_path, fallback_title=filename)
+        book_data = analyse_ebook(save_path)
         file_hash = book_data['file_hash']
         return redirect(f'/books/{file_hash}')
 
