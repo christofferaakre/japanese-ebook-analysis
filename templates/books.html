@@ -16,7 +16,7 @@
     {% for book in books %}
     <li class="book">
         <h2 class="title">{{book.title}}</h2>
-        {% if book.title %}
+        {% if book.authors | length > 0 %}
             <span class="author">{{book.authors|join(', ')}}</span>
             {% else %}
                 <span class="author">Author: N/A</span>
