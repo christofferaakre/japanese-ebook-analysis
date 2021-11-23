@@ -34,15 +34,20 @@ are for each word, and the same for the characters as well.
 
 ## Development
 1. Clone repository: `git clone https://github.com/christofferaakre/japanese-ebook-analysis.git`
-2. Make sure you have `mecab` and `mecab-ipadic-neologd` set up on your system. See
+2. Make sure you have `mecab` and `mecab-ipadic-neologd` set up on your system.
+If you're on linux or Windows WSL, just run the `setup.sh` script:
+`./setup.sh`
+For Mac, see
 [http://www.robfahey.co.uk/blog/japanese-text-analysis-in-python/](http://www.robfahey.co.uk/blog/japanese-text-analysis-in-python/)
 <br>(Only required if you will actually upload ebooks or run the `analyse_epub.py` script),
 which you will not need to do to contribute to other parts of the app.
-for a good guide on how to set it up.
+for a good guide on how to set it up. If installing on Mac, you
+    will currently need to change the installation path to
+    `usr/lib/mecab/dic/mecab-ipadic-neologd` using the `-p` flag.
 3. Install python dependencies: `pip install -r requirements.txt`
 4. Install other dependencies (these all need to be in your system path):
     * `pandoc`
-5. Run `./app.py` to start the flask dev server
+5. Run `./app.py` or `python3 app.py` to start the flask dev server
 
 ## Contributing
 I'm very happy for any happy contributions! Before contributing, please
