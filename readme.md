@@ -34,7 +34,7 @@ are for each word, and the same for the characters as well.
 
 ## Development
 1. Clone repository: `git clone https://github.com/christofferaakre/japanese-ebook-analysis.git`
-2. Make sure you have `mecab` set up on your system. See
+2. Make sure you have `mecab` and `mecab-ipadic-neologd` set up on your system. See
 [http://www.robfahey.co.uk/blog/japanese-text-analysis-in-python/](http://www.robfahey.co.uk/blog/japanese-text-analysis-in-python/)
 <br>(Only required if you will actually upload ebooks or run the `analyse_epub.py` script),
 which you will not need to do to contribute to other parts of the app.
