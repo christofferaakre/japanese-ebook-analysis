@@ -36,7 +36,7 @@ are for each word, and the same for the characters as well.
 1. Clone repository: `git clone https://github.com/christofferaakre/japanese-ebook-analysis.git`
 2. Make sure you have `mecab` and `mecab-ipadic-neologd` set up on your system.
 If you're on linux or Windows WSL, just run the `setup.sh` script:
-`./setup.sh`
+`./setup.sh` and then restart your shell.
 For Mac, see
 [http://www.robfahey.co.uk/blog/japanese-text-analysis-in-python/](http://www.robfahey.co.uk/blog/japanese-text-analysis-in-python/)
 <br>(Only required if you will actually upload ebooks or run the `analyse_epub.py` script),
@@ -62,3 +62,10 @@ and its
 Feel free to submit your own issue or pull request about a new feature or anything
 else. When submitting a pull request, don't be afraid to modify any of the files;
 I'm not very attached to the coding style used in the repo.
+
+## Bug reports
+Please report bugs in the
+[Issues](https://github.com/christofferaakre/japanese-ebook-analysis/issues)
+section of the repo with the 'bug' label. Try to make your bug
+report as descriptive as possible to make it easy for others to track
+down the cause and potential fix of your issue.
