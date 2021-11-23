@@ -4,6 +4,8 @@ import re
 import json
 from pathlib import Path
 
+from frequency_lists import FrequencyList
+
 def get_all_subdirs(path: str) -> list:
     """
     Returns a list of all the subdirectories that exist

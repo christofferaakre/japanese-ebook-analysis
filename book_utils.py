@@ -1,8 +1,8 @@
-from re import S
 import subprocess
 import MeCab
 import epub_meta
 from utils import save_base64_image, convert_epub_to_txt, process_japanese_text, parse_sentence, remove_ruby_text_from_epub
+from frequency_lists import get_all_frequency_lists, get_frequency
 
 from Book import Book
 
@@ -10,6 +10,7 @@ from pathlib import Path
 import hashlib
 import mmap
 import json
+import simplejson
 
 from constants import UPLOAD_FOLDER
 
@@ -107,6 +108,7 @@ def analyse_ebook(filename: str) -> object:
 
     mt = MeCab.Tagger('-r /dev/null -d /usr/lib/mecab/dic/mecab-ipadic-neologd/')
     book = process_file(filename)
+    frequency_lists = get_all_frequency_lists()
 
     with open(book.path, 'r', encoding='utf-8') as file:
         text = file.read()
@@ -123,7 +125,12 @@ def analyse_ebook(filename: str) -> object:
     words_with_uses = sorted([(word, words.count(word)) for word in unique_words], key=lambda tup: tup[1], reverse=True)
     used_once = [word for word, uses in words_with_uses if uses == 1]
 
-    word_list = [{"word": word, "ocurrences": occurences} for word, occurences in words_with_uses]
+    word_list = [{"word": word,
+                  "ocurrences": occurences,
+                  "frequency": get_frequency(word, frequency_lists)
+                  }
+                  for word, occurences in words_with_uses
+                  ]
     char_list = [{"character": char, "occurences": occurences} for char, occurences in chars_with_uses]
 
     book_data = {
@@ -143,7 +150,8 @@ def analyse_ebook(filename: str) -> object:
 
     json_filename = f'{book.book_dir}/book_data.json'
     with open(json_filename, 'w', encoding='utf-8') as file:
-            json.dump(book_data, file)
+            simplejson.dump(book_data, file)
+            #json.dump(book_data, file)
     print(f'wrote data to {json_filename}')
 
     clean_dir(book.book_dir, keep_extensions=['.json', '.jpg', '.png'])

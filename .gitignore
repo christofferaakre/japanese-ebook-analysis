@@ -3,6 +3,5 @@ __pycache__
 .env
 data
 *.ipynb
-static/books/*/
 uploads/*
 !uploads/.gitkeep
