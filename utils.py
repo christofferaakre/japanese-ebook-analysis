@@ -4,72 +4,7 @@ import re
 import json
 from pathlib import Path
 
-from FrequencyList import FrequencyList, Word
-
-def stars_from_frequency(freq: int) -> int:
-    """
-    Returns the appropriate number of frequency stars
-    given the frequency. The rule is as follows:
-    1-1500: 5 stars
-    1501-5000: 4 stars
-    5001-15000: 3 stars
-    15001-30000: 2 stars
-    30001-60000: 1 star
-    60001+: 0 stars
-    Arguments:
-    frequency: int - The frequency of the word
-    """
-    if 1 <= freq <= 1500:
-        return 5
-    elif 1501 <= freq <= 5000:
-        return 4
-    elif 5001 <= freq <= 15000:
-        return 3
-    elif 15001 <= freq <= 30000:
-        return 2
-    elif 30001 <= freq <= 60000:
-        return 1
-    elif 60001 <= freq:
-        return 0
-    else:
-        raise ValueError(f'''
-        {freq} is not a postiive integer. You must provide
-        a positive integer as the frequency.
-        ''')
-
-def process_frequency_list(filename: str) -> FrequencyList:
-    """
-    Processes a frequency list json file and returns
-    a FrequencyList object describing the frequency list
-    Arguments:
-    filename: str - The path to the json file
-    """
-    name = filename.split('/')[-1].split('.')[-2]
-
-    with open(filename, 'r') as file:
-        data = json.load(file)
-
-    # format used in word, 'freq', *stars* (freq),
-    # e.g. 'の', 'freq', '★★★★★ (1)'
-
-    number_regex = r'[0-9]+'
-    words = {}
-
-    for word, _, freq_string in data:
-        match = re.search(number_regex, freq_string)
-        assert match is not None, f'Could not find a frequency for {word} in {filename}'
-
-        freq = int(match[0])
-        stars = stars_from_frequency(freq)
-        word_object = Word(freq, stars)
-        words[word] = word_object
-
-    frequency_list = FrequencyList(name, words)
-    return frequency_list
-
-
-
-
+from frequency_lists import FrequencyList
 
 def get_all_subdirs(path: str) -> list:
     """
