@@ -3,6 +3,7 @@ import subprocess
 import re
 import json
 from pathlib import Path
+from MecabNode import MecabNode
 
 from frequency_lists import FrequencyList
 
@@ -120,13 +121,18 @@ def parse_sentence(sentence: str, mt) -> list:
     mt - A mecab tagger. Create using MeCab.Tagger
     """
     filter_str = r'()./,!:?\uksa0123456789\t\r\s .'
-    parsed = mt.parseToNode(sentence)
+    parse_results = mt.parse(sentence).split("\n")
     words = []
-    while parsed:
-        word = re.sub(r'\s+', '', parsed.surface)
+
+    for line in parse_results:
+        # ignore mecab's EOS outputs and line without tabs
+        if line.startswith("EOS") or not "\t" in line:
+            continue
+
+        node = MecabNode(line)
+        word = re.sub(r'\s+', '', node.surface)
         for char in filter_str:
             word = word.replace(char, '')
         if len(word) >= 1:
             words.append(word)
-        parsed = parsed.next
     return words
