@@ -3,6 +3,7 @@ import MeCab
 import epub_meta
 from utils import save_base64_image, convert_epub_to_txt, process_japanese_text, parse_sentence, remove_ruby_text_from_epub
 from frequency_lists import get_all_frequency_lists, get_frequency
+from analysis import analyse_chars, analyse_words
 
 from Book import Book
 
@@ -113,11 +114,7 @@ def analyse_ebook(filename: str) -> object:
     with open(book.path, 'r', encoding='utf-8') as file:
         text = file.read()
 
-    # Analysing characters
-    chars = list(text)
-    unique_chars = set(text)
-    chars_with_uses = sorted([(char, chars.count(char)) for char in unique_chars], key=lambda tup: tup[1], reverse=True)
-    chars_used_once = [char for char, count in chars_with_uses if count == 1]
+    chars = analyse_chars(text)
 
     # analysing words
     words = parse_sentence(text, mt)
@@ -131,8 +128,6 @@ def analyse_ebook(filename: str) -> object:
                   }
                   for word, occurences in words_with_uses
                   ]
-    char_list = [{"character": char, "occurences": occurences} for char, occurences in chars_with_uses]
-
     book_data = {
         'title': book.title,
         'authors': book.authors,
@@ -141,10 +136,10 @@ def analyse_ebook(filename: str) -> object:
         'n_words_unique': len(unique_words),
         'n_words_used_once': len(used_once),
         'n_chars': len(chars),
-        'n_chars_unique': len(unique_chars),
-        'n_chars_used_once': len(chars_used_once),
+        'n_chars_unique': len(chars.unique),
+        'n_chars_used_once': len(chars.used_once),
         'words': word_list,
-        'chars': char_list,
+        'chars': chars.with_uses,
         'file_hash': book.file_hash
     }
 
