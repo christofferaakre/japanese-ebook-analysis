@@ -70,3 +70,17 @@ def analyse_words(text: str, mt, frequency_lists: List[FrequencyList]) -> WordAn
             used_once=used_once,
             known=known
             )
+
+def process_wordlist(filename: str) -> Set[str]:
+    """
+    Process the given word-list (in .txt format) and
+    returns a list of all the words in the file.
+    The file must be a .txt file with words separated
+    by newline characters.
+    Arguments:
+    filename: str - The path to the .txt file containing the words
+    """
+    with open(filename, 'r') as file:
+        words = set(file.readlines())
+
+    return words
