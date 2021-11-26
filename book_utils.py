@@ -3,6 +3,7 @@ import MeCab
 import epub_meta
 from utils import save_base64_image, convert_epub_to_txt, process_japanese_text, parse_sentence, remove_ruby_text_from_epub
 from frequency_lists import get_all_frequency_lists, get_frequency
+from analysis import analyse_chars, analyse_words
 
 from Book import Book
 
@@ -108,45 +109,28 @@ def analyse_ebook(filename: str) -> object:
 
     mt = MeCab.Tagger('-r /dev/null -d /usr/lib/mecab/dic/mecab-ipadic-neologd/')
     book = process_file(filename)
-    frequency_lists = get_all_frequency_lists()
 
     with open(book.path, 'r', encoding='utf-8') as file:
         text = file.read()
 
-    # Analysing characters
-    chars = list(text)
-    unique_chars = set(text)
-    chars_with_uses = sorted([(char, chars.count(char)) for char in unique_chars], key=lambda tup: tup[1], reverse=True)
-    chars_used_once = [char for char, count in chars_with_uses if count == 1]
-
-    # analysing words
-    words = parse_sentence(text, mt)
-    unique_words = set(words)
-    words_with_uses = sorted([(word, words.count(word)) for word in unique_words], key=lambda tup: tup[1], reverse=True)
-    used_once = [word for word, uses in words_with_uses if uses == 1]
-
-    word_list = [{"word": word,
-                  "ocurrences": occurences,
-                  "frequency": get_frequency(word, frequency_lists)
-                  }
-                  for word, occurences in words_with_uses
-                  ]
-    char_list = [{"character": char, "occurences": occurences} for char, occurences in chars_with_uses]
+    frequency_lists = get_all_frequency_lists()
+    chars = analyse_chars(text)
+    words = analyse_words(text, mt, frequency_lists)
 
     book_data = {
-        'title': book.title,
-        'authors': book.authors,
-        'image': book.image,
-        'n_words': len(words),
-        'n_words_unique': len(unique_words),
-        'n_words_used_once': len(used_once),
-        'n_chars': len(chars),
-        'n_chars_unique': len(unique_chars),
-        'n_chars_used_once': len(chars_used_once),
-        'words': word_list,
-        'chars': char_list,
-        'file_hash': book.file_hash
-    }
+    'title': book.title,
+    'authors': book.authors,
+    'image': book.image,
+    'n_words': len(words),
+    'n_words_unique': len(words.unique),
+    'n_words_used_once': len(words.used_once),
+    'n_chars': len(chars),
+    'n_chars_unique': len(chars.unique),
+    'n_chars_used_once': len(chars.used_once),
+    'words': words.with_uses,
+    'chars': chars.with_uses,
+    'file_hash': book.file_hash
+}
 
     json_filename = f'{book.book_dir}/book_data.json'
     with open(json_filename, 'w', encoding='utf-8') as file:
