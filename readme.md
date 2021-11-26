@@ -18,6 +18,8 @@ they are used
 
 For text processing, we use [MeCab](https://taku910.github.io/mecab/)
 
+![Example image showing information about book after analysis](images/book-information.png)
+
 ## Usage
 Currently, the project is not deployed anywhere, so to use the service,
 you will need to follow the steps below in the development section to
