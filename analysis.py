@@ -13,7 +13,8 @@ class WordAnalysis(NamedTuple):
     unique: Set[str]
     with_uses: List[Tuple[str, int]]
     used_once: Set[str]
-    known: Set[str]
+    known_unique: int
+    known_total: int
 
 def analyse_chars(text: str) -> CharAnalysis:
     """
@@ -63,10 +64,45 @@ def analyse_words(text: str, mt, frequency_lists: List[FrequencyList]) -> WordAn
         )
 
     used_once = {word['word'] for word in words_with_uses if word['occurences'] == 1}
-    known = unique_words
+
+    known = analyse_known_words(unique_words, words)
+
     return WordAnalysis(all=words,
             unique=unique_words,
             with_uses=words_with_uses,
             used_once=used_once,
-            known=known
+            known_unique=known['unique'],
+            known_total=known['total']
             )
+
+def analyse_known_words(unique_words: Set[str], words: List[str]) -> Dict[str, int]:
+    """
+    Given a set of unique words present in a text, and a list of all the words
+    that appear (including repeats), performs some simple known words analysis
+    and return the number of unique known words, as well as the total number of
+    (non-unique) words in the text that are known
+    Arguments:
+    unique_words: Set[str] - The set of unique words in the text
+    words: List[str] - The list of all (non-unique) words in the text
+    """
+    known_words = process_wordlist('word-list.txt')
+    n_known_words = len(unique_words.intersection(known_words))
+    total_known_words = sum(1 if word in known_words else 0 for word in words)
+    return {
+            "unique": n_known_words,
+            "total": total_known_words
+           }
+
+def process_wordlist(filename: str) -> Set[str]:
+    """
+    Process the given word-list (in .txt format) and
+    returns a list of all the words in the file.
+    The file must be a .txt file with words separated
+    by newline characters.
+    Arguments:
+    filename: str - The path to the .txt file containing the words
+    """
+    with open(filename, 'r') as file:
+        words = set([line.replace('\n', '') for line in file.readlines()])
+
+    return words
