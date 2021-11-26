@@ -130,3 +130,17 @@ def parse_sentence(sentence: str, mt) -> list:
             words.append(word)
         parsed = parsed.next
     return words
+
+def process_wordlist(filename: str) -> List[str]:
+    """
+    Process the given word-list (in .txt format) and
+    returns a list of all the words in the file.
+    The file must be a .txt file with words separated
+    by newline characters.
+    Arguments:
+    filename: str - The path to the .txt file containing the words
+    """
+    with open(filename, 'r') as file:
+        words = set(file.readlines())
+
+    return words
