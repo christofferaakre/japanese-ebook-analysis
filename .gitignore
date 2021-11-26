@@ -1,7 +1,7 @@
 .ipynb_checkpoints
 __pycache__
 .env
-data
+hidden-data
 *.ipynb
 static/books/*/
 uploads/*
