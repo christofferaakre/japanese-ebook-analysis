@@ -12,8 +12,12 @@ import hashlib
 import mmap
 import json
 import simplejson
-
 from constants import UPLOAD_FOLDER
+import numpy as np 
+import pandas as pd 
+import matplotlib.pyplot as plt
+import plotly.express as px
+import plotly.io as pio
 
 def sha256sum(filename: str) -> str:
     """
@@ -142,6 +146,7 @@ def analyse_ebook(filename: str) -> object:
 
     clean_dir(book.book_dir, keep_extensions=['.json', '.jpg', '.png'])
     clean_dir(UPLOAD_FOLDER)
+    gethistogram(word_list) 
 
     return book_data
 
@@ -162,3 +167,58 @@ def clean_dir(directory: str, keep_extensions: list = None) -> None:
             extension = f.suffix
             if not extension in keep_extensions:
                 f.unlink()
+
+def gethistogram(word_list):
+    """
+    This functions Creates a pandas dataframe of Range and stars of the data in word_list that has 'netflix' in it.
+    Range is the bins of the histogram
+    """
+    bins =  generatebins(getmaximumfreq(word_list)) #generating the bins
+    dic = {"Range": "0-500" ,"Stars": [np.nan]} #Creating the columns of the data framw
+    df = pd.DataFrame(dic)
+    for i in bins:
+        df = df.append({'Range':i,'Stars':0},ignore_index=True) 
+    for i in word_list:
+        key = 'netflix' #netflix is the key
+        if key in i['frequency'].keys():  # element is: i['frequency']['netflix'].frequency
+            df = df.append({"Range":bins[getbins(i['frequency']['netflix'].frequency,bins)],"Stars":i['frequency']['netflix'].stars},ignore_index=True)
+    stars_design = ["★","★★","★★★","★★★★","★★★★★"]
+    fig = px.histogram(df, 'Range',color='Range') # generating the plotly histogram
+    pio.write_html(fig, file='Histogram.html')
+
+def getbins(freq_num,bins):
+    """
+    This function determines which range the number falls into
+    example: 100, will fall into the range '0-500' 
+    """
+    flag=1
+    for i in range(len(bins)):
+        lst = bins[i].split("-")
+        if freq_num >= int(lst[0]) and freq_num < int(lst[1]):
+            return i 
+    return (len(bins)-1)
+        
+
+def generatebins(maximum_num):
+    """
+    This function generates bins based on the maximum element value 
+    """
+    a = 0
+    b= 500
+    lst=[]
+    while(b<=maximum_num):
+        lst.append(str(a)+"-"+str(b))
+        a=b
+        b=b+500
+    return lst
+
+def getmaximumfreq(word_list):
+    """
+    This functions gets the highest frequency value of the word
+    """
+    maximum_num = 0
+    for i in word_list:
+        key = 'netflix'
+        if key in i['frequency'].keys():
+            maximum_num = max(maximum_num,i['frequency']['netflix'].frequency)
+    return maximum_num
