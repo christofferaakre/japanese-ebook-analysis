@@ -5,10 +5,14 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 import plotly.io as pio
 
-def get_histogram(words: WordAnalysis) -> None:
+def get_histogram(words: WordAnalysis) -> str:
     """
-    This functions Creates a pandas dataframe of Range and stars of the data in word_list that has 'netflix' in it.
-    Range is the bins of the histogram
+    Creates a histogram showing the unweighted frequency distribution
+    of the (unique) words used in the book. Returns the path to the
+    saved histogram.
+    Arguments:
+    words: WordAnalysis - A WordAnalysis object describing the words used
+    in the book
     """
     bins =  generate_bins(get_maximum_frequency(words)) #generating the bins
     dic = {"Range": "0-500" ,"Stars": [np.nan]} #Creating the columns of the data framw
@@ -22,7 +26,9 @@ def get_histogram(words: WordAnalysis) -> None:
             df = df.append({"Range":bins[get_bins(word['frequency']['netflix'].frequency,bins)],"Stars":word['frequency']['netflix'].stars},ignore_index=True)
     stars_design = ["★","★★","★★★","★★★★","★★★★★"]
     fig = px.histogram(df, 'Range',color='Range') # generating the plotly histogram
-    pio.write_html(fig, file='Histogram.html')
+    path = 'Histogram.html'
+    pio.write_html(fig, file=path)
+    return path
 
 def get_bins(freq_num,bins):
     """
