@@ -3,7 +3,7 @@ import MeCab
 import epub_meta
 from utils import save_base64_image, convert_epub_to_txt, process_japanese_text, parse_sentence, remove_ruby_text_from_epub
 from frequency_lists import get_all_frequency_lists, get_frequency
-from analysis import analyse_chars, analyse_words
+from analysis import analyse_chars, analyse_words, WordAnalysis
 
 from Book import Book
 
@@ -13,8 +13,8 @@ import mmap
 import json
 import simplejson
 from constants import UPLOAD_FOLDER
-import numpy as np 
-import pandas as pd 
+import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 import plotly.express as px
 import plotly.io as pio
@@ -146,7 +146,7 @@ def analyse_ebook(filename: str) -> object:
 
     clean_dir(book.book_dir, keep_extensions=['.json', '.jpg', '.png'])
     clean_dir(UPLOAD_FOLDER)
-    gethistogram(word_list) 
+    gethistogram(words)
 
     return book_data
 
@@ -168,20 +168,21 @@ def clean_dir(directory: str, keep_extensions: list = None) -> None:
             if not extension in keep_extensions:
                 f.unlink()
 
-def gethistogram(word_list):
+def gethistogram(words: WordAnalysis) -> None:
     """
     This functions Creates a pandas dataframe of Range and stars of the data in word_list that has 'netflix' in it.
     Range is the bins of the histogram
     """
-    bins =  generatebins(getmaximumfreq(word_list)) #generating the bins
+    bins =  generatebins(getmaximumfreq(words)) #generating the bins
     dic = {"Range": "0-500" ,"Stars": [np.nan]} #Creating the columns of the data framw
     df = pd.DataFrame(dic)
     for i in bins:
-        df = df.append({'Range':i,'Stars':0},ignore_index=True) 
-    for i in word_list:
+        df = df.append({'Range':i,'Stars':0},ignore_index=True)
+
+    for word in words.with_uses:
         key = 'netflix' #netflix is the key
-        if key in i['frequency'].keys():  # element is: i['frequency']['netflix'].frequency
-            df = df.append({"Range":bins[getbins(i['frequency']['netflix'].frequency,bins)],"Stars":i['frequency']['netflix'].stars},ignore_index=True)
+        if key in word['frequency'].keys():  # element is: i['frequency']['netflix'].frequency
+            df = df.append({"Range":bins[getbins(word['frequency']['netflix'].frequency,bins)],"Stars":word['frequency']['netflix'].stars},ignore_index=True)
     stars_design = ["★","★★","★★★","★★★★","★★★★★"]
     fig = px.histogram(df, 'Range',color='Range') # generating the plotly histogram
     pio.write_html(fig, file='Histogram.html')
@@ -189,19 +190,19 @@ def gethistogram(word_list):
 def getbins(freq_num,bins):
     """
     This function determines which range the number falls into
-    example: 100, will fall into the range '0-500' 
+    example: 100, will fall into the range '0-500'
     """
     flag=1
     for i in range(len(bins)):
         lst = bins[i].split("-")
         if freq_num >= int(lst[0]) and freq_num < int(lst[1]):
-            return i 
+            return i
     return (len(bins)-1)
-        
+
 
 def generatebins(maximum_num):
     """
-    This function generates bins based on the maximum element value 
+    This function generates bins based on the maximum element value
     """
     a = 0
     b= 500
@@ -212,13 +213,16 @@ def generatebins(maximum_num):
         b=b+500
     return lst
 
-def getmaximumfreq(word_list):
+def getmaximumfreq(words: WordAnalysis) -> int:
     """
     This functions gets the highest frequency value of the word
+    Arguments:
+    words: WordAnalysis - A WordAnalysis object describing the words
+    used in the book
     """
     maximum_num = 0
-    for i in word_list:
+    for word in words.with_uses:
         key = 'netflix'
-        if key in i['frequency'].keys():
-            maximum_num = max(maximum_num,i['frequency']['netflix'].frequency)
+        if key in word['frequency'].keys():
+            maximum_num = max(maximum_num,word['frequency']['netflix'].frequency)
     return maximum_num

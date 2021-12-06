@@ -11,7 +11,7 @@ class CharAnalysis(NamedTuple):
 class WordAnalysis(NamedTuple):
     all: List[str]
     unique: Set[str]
-    with_uses: List[Tuple[str, int]]
+    with_uses: List[Dict[str, Any]]
     used_once: Set[str]
     known_unique: int
     known_total: int
