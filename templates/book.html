@@ -1,0 +1,21 @@
+<html lang="en">
+{% include "header.html" %}
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
+    <link rel="stylesheet" href="{{ url_for('static', filename="css/books.css") }}">
+    <title>Book Analaysis</title>
+</head>
+<body>
+
+    <ul class="books">
+        {% include 'basic-info.html' %}
+        {% include 'json-data-button.html' %}
+        {% include 'plots.html' %}
+    </ul>
+
+</body>
+</html>
