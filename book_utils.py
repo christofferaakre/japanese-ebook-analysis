@@ -116,7 +116,7 @@ def analyse_ebook(filename: str) -> object:
     chars = analyse_chars(text)
     words = analyse_words(text, mt, frequency_lists)
 
-    histogram_path = get_histogram(words, f'{book.book_dir}histogram.html')
+    histogram_path = get_histogram(words, f'{book.book_dir}/histogram.html')
 
     book_data = {
     'title': book.title,
@@ -142,8 +142,10 @@ def analyse_ebook(filename: str) -> object:
             #json.dump(book_data, file)
     print(f'wrote data to {json_filename}')
 
-    clean_dir(book.book_dir, keep_extensions=['.json', '.jpg', '.png'])
+
+    clean_dir(book.book_dir, keep_extensions=['.json', '.jpg', '.png', '.html'])
     clean_dir(UPLOAD_FOLDER)
+
 
     return book_data
 
