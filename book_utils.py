@@ -116,10 +116,13 @@ def analyse_ebook(filename: str) -> object:
     chars = analyse_chars(text)
     words = analyse_words(text, mt, frequency_lists)
 
+    histogram_path = get_histogram(words, f'{book.book_dir}histogram.html')
+
     book_data = {
     'title': book.title,
     'authors': book.authors,
     'image': book.image,
+    'histogram': histogram_path,
     'n_words': len(words.all),
     'n_words_unique': len(words.unique),
     'n_words_used_once': len(words.used_once),
@@ -141,7 +144,6 @@ def analyse_ebook(filename: str) -> object:
 
     clean_dir(book.book_dir, keep_extensions=['.json', '.jpg', '.png'])
     clean_dir(UPLOAD_FOLDER)
-    get_histogram(words)
 
     return book_data
 

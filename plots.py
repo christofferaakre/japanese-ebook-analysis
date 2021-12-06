@@ -6,7 +6,7 @@ import plotly.express as px
 import plotly.io as pio
 from typing import List
 
-def get_histogram(words: WordAnalysis) -> str:
+def get_histogram(words: WordAnalysis, save_path: str) -> str:
     """
     Creates a histogram showing the unweighted frequency distribution
     of the (unique) words used in the book. Returns the path to the
@@ -14,6 +14,7 @@ def get_histogram(words: WordAnalysis) -> str:
     Arguments:
     words: WordAnalysis - A WordAnalysis object describing the words used
     in the book
+    save_path: str - The path to save the histogram to
     """
     bins =  generate_bins(minimum=0, maximum=get_maximum_frequency(words), bin_width=500)
     dic = {"Range": "0-500" ,"Stars": [np.nan]} #Creating the columns of the data framw
@@ -28,10 +29,9 @@ def get_histogram(words: WordAnalysis) -> str:
             df = df.append({"Range":bins[get_bins(word['frequency']['netflix'].frequency,bins)],"Stars":word['frequency']['netflix'].stars},ignore_index=True)
 
     fig = px.histogram(df, 'Range',color='Range')
-    path = 'Histogram.html'
-    pio.write_html(fig, file=path)
+    pio.write_html(fig, file=save_path)
 
-    return path
+    return save_path
 
 def get_bins(frequency: int, bins: List[str]) -> int:
     """
