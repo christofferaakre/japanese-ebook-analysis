@@ -6,7 +6,7 @@ import plotly.express as px
 import plotly.io as pio
 from typing import List
 
-def get_histogram(words: WordAnalysis, save_path: str) -> str:
+def get_histogram(words: WordAnalysis, title: str, save_path: str) -> str:
     """
     Creates a histogram showing the unweighted frequency distribution
     of the (unique) words used in the book. Returns the path to the
@@ -14,6 +14,7 @@ def get_histogram(words: WordAnalysis, save_path: str) -> str:
     Arguments:
     words: WordAnalysis - A WordAnalysis object describing the words used
     in the book
+    title: str - The title of the histogram plot
     save_path: str - The path to save the histogram to
     """
     bins =  generate_bins(minimum=0, maximum=get_maximum_frequency(words), bin_width=500)
@@ -28,8 +29,24 @@ def get_histogram(words: WordAnalysis, save_path: str) -> str:
         if key in word['frequency'].keys():
             df = df.append({"Range":bins[get_bins(word['frequency']['netflix'].frequency,bins)],"Stars":word['frequency']['netflix'].stars},ignore_index=True)
 
-    fig = px.histogram(df, 'Range',color='Range')
+    fig = px.histogram(
+            df,
+            'Range',
+            color='Range',
+            )
+
+    # changing axis labels
+    fig.layout.xaxis.title.text = 'Frequency'
+    fig.layout.yaxis.title.text = 'Number of unique words'
+
+    fig.update_layout(title_text=title,
+                      title_x=0.5,
+                      showlegend=False,
+                      )
+
+    #TODO: make plot look nicer
     fig.write_image(save_path)
+
     # not doing html plots at the moment because
     # it is kind of a pain to apply css to them
     # pio.write_html(fig, file=save_path)

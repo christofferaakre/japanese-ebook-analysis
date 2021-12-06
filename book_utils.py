@@ -116,7 +116,11 @@ def analyse_ebook(filename: str) -> object:
     chars = analyse_chars(text)
     words = analyse_words(text, mt, frequency_lists)
 
-    histogram_path = get_histogram(words, f'{book.book_dir}/histogram.png')
+    histogram_path = get_histogram(
+            words,
+            title=f'Frequency distribution for {book.title}',
+            save_path=f'{book.book_dir}/histogram.png'
+            )
 
     plots = [histogram_path]
 
