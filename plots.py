@@ -4,6 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import plotly.express as px
 import plotly.io as pio
+from typing import List
 
 def get_histogram(words: WordAnalysis) -> str:
     """
@@ -14,58 +15,83 @@ def get_histogram(words: WordAnalysis) -> str:
     words: WordAnalysis - A WordAnalysis object describing the words used
     in the book
     """
-    bins =  generate_bins(get_maximum_frequency(words)) #generating the bins
+    bins =  generate_bins(minimum=0, maximum=get_maximum_frequency(words), bin_width=500)
     dic = {"Range": "0-500" ,"Stars": [np.nan]} #Creating the columns of the data framw
     df = pd.DataFrame(dic)
+
     for i in bins:
         df = df.append({'Range':i,'Stars':0},ignore_index=True)
 
     for word in words.with_uses:
-        key = 'netflix' #netflix is the key
-        if key in word['frequency'].keys():  # element is: i['frequency']['netflix'].frequency
+        key = 'netflix'
+        if key in word['frequency'].keys():
             df = df.append({"Range":bins[get_bins(word['frequency']['netflix'].frequency,bins)],"Stars":word['frequency']['netflix'].stars},ignore_index=True)
-    stars_design = ["★","★★","★★★","★★★★","★★★★★"]
-    fig = px.histogram(df, 'Range',color='Range') # generating the plotly histogram
+
+    fig = px.histogram(df, 'Range',color='Range')
     path = 'Histogram.html'
     pio.write_html(fig, file=path)
+
     return path
 
-def get_bins(freq_num,bins):
+def get_bins(frequency: int, bins: List[str]) -> int:
     """
-    This function determines which range the number falls into
-    example: 100, will fall into the range '0-500'
+    Determines which bin a word walls into
+    based on its frequency and the bins themselves
+    For example, with bins of width 500, a word with frequency
+    1301 will fall into the bin 1001-1500.
+    Returns the index in bins for the correct bin, i.e. with bin width
+    500 and frequency 1301, the function will return 2, as 1001-1500
+    is the 3rd bin in the elist.
+    Arguments:
+    frequency: int - The frequency of the word
+    bins: List[str] - A list of the bins in the format 'low-high', for example
+    ['0-500', '501-1000', '1001-1500', ...]
     """
-    flag=1
+
     for i in range(len(bins)):
-        lst = bins[i].split("-")
-        if freq_num >= int(lst[0]) and freq_num < int(lst[1]):
+        bin = bins[i].split("-")
+        assert len(bin) == 2, "Bin must have length 2"
+
+        low, high = bin
+        if frequency >= int(low) and frequency < int(high):
             return i
+
     return (len(bins)-1)
 
+def generate_bins(minimum: int, maximum: int, bin_width: int=500) -> List[str]:
+    """
+    This function generates histogram binnings based on the minimum/maximum
+    value of the data and the bin width and returns them in the format
+    ['low-high'], e.g. ['0-500', '501-1000', ...]
+    Arguments:
+    minimum: int - The minimum allowed value for the data
+    maximum: int - The maximum allowed value for the data
+    bin_width: int (Optional, default 500) - The width of the bins
+    """
+    low = 0
+    high = bin_width
+    bins=[]
 
-def generate_bins(maximum_num):
-    """
-    This function generates bins based on the maximum element value
-    """
-    a = 0
-    b= 500
-    lst=[]
-    while(b<=maximum_num):
-        lst.append(str(a)+"-"+str(b))
-        a=b
-        b=b+500
-    return lst
+    while(high<=maximum):
+        bin = str(low)+"-"+str(high)
+        bins.append(bin)
+        low = high
+        high += bin_width
+
+    return bins
 
 def get_maximum_frequency(words: WordAnalysis) -> int:
     """
-    This functions gets the highest frequency value of the word
+    This functions gets the highest frequency present in all the
+    words.
     Arguments:
     words: WordAnalysis - A WordAnalysis object describing the words
     used in the book
     """
-    maximum_num = 0
+    maximum_frequency = 0
     for word in words.with_uses:
         key = 'netflix'
         if key in word['frequency'].keys():
-            maximum_num = max(maximum_num,word['frequency']['netflix'].frequency)
-    return maximum_num
+            maximum_frequency = max(maximum_frequency,word['frequency']['netflix'].frequency)
+    return maximum_frequency
+
