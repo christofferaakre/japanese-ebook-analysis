@@ -2,7 +2,7 @@
 import os
 
 from flask import Flask, flash, request, redirect, url_for, jsonify
-from flask.templating import render_template
+from flask.templating import render_template, render_template_string
 from werkzeug.utils import secure_filename
 
 from book_utils import analyse_ebook
@@ -31,7 +31,13 @@ def show_books():
 @app.route('/books/<string:hash>', methods=['GET'])
 def show_book(hash: str):
     book_data = get_book(hash)
-    return render_template('books.html', books=[book_data])
+    # return render_template('books.html', books=[book_data])
+    return render_template('book.html', book=book_data)
+
+@app.route('/books/<string:hash>/plots', methods=['GET'])
+def show_plots(hash: str):
+    book_data = get_book(hash)
+    return render_template('plots.html', book=book_data)
 
 @app.route('/api/books/<string:hash>', methods=['GET'])
 def return_json(hash: str):

@@ -31,7 +31,7 @@ def get_books() -> list:
         books.append(book_data)
     return books
 
-def get_book(hash: str) -> object:
+def get_book(hash: str) -> dict:
     """
     Returns the data for the book with the given hash.
     Arguments:

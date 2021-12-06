@@ -116,13 +116,15 @@ def analyse_ebook(filename: str) -> object:
     chars = analyse_chars(text)
     words = analyse_words(text, mt, frequency_lists)
 
-    histogram_path = get_histogram(words, f'{book.book_dir}/histogram.html')
+    histogram_path = get_histogram(words, f'{book.book_dir}/histogram.png')
+
+    plots = [histogram_path]
 
     book_data = {
     'title': book.title,
     'authors': book.authors,
     'image': book.image,
-    'histogram': histogram_path,
+    'plots': plots,
     'n_words': len(words.all),
     'n_words_unique': len(words.unique),
     'n_words_used_once': len(words.used_once),
@@ -141,7 +143,6 @@ def analyse_ebook(filename: str) -> object:
             simplejson.dump(book_data, file)
             #json.dump(book_data, file)
     print(f'wrote data to {json_filename}')
-
 
     clean_dir(book.book_dir, keep_extensions=['.json', '.jpg', '.png', '.html'])
     clean_dir(UPLOAD_FOLDER)

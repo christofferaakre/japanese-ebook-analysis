@@ -7,111 +7,18 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
 
-    <link rel="stylesheet"
-    href="{{ url_for('static', filename="css/books.css") }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename="css/books.css") }}">
     <title>Book Analaysis</title>
+
 </head>
 <body>
+
     <ul class="books">
-    {% for book in books %}
-    <li class="book">
-        <h2 class="title">{{book.title}}</h2>
-        {% if book.authors | length > 0 %}
-            <span class="author">{{book.authors|join(', ')}}</span>
-            {% else %}
-                <span class="author">Author: N/A</span>
-        {% endif %}
-        <div class="book-container">
-            {% if book.image | length > 2 %}
-                <img class="cover-image" src="{{ url_for('static', filename='../' + book.image)}}"/>
-            {% endif %}
-        <div class="info-container">
-            <h3 class="sub-title">Book length</h3>
-            <span class="info">Length of book in words:
-                <span class="value">
-                {{book.n_words}}
-                </span>
-            </span>
-
-
-        <span class="info">Length of book in characters:
-                <span class="value">
-                {{book.n_chars}}
-                </span>
-            </span>
-
-            <h3 class="sub-title">Words used</h3>
-
-            <span class="info">Number of unique words used:
-                <span class="value">
-                {{book.n_words_unique}}
-                </span>
-            </span>
-
-            <span class="info">Number of unique words used only once:
-                <span class="value">
-                {{book.n_words_used_once}}
-                </span>
-            </span>
-
-            <span class="info">Percentage of unique words used only once:
-                <span class="value">
-                {{(book.n_words_used_once / book.n_words_unique * 100)|int}}%
-                </span>
-            </span>
-
-            <h3 class="sub-tile">Known words analysis</h3>
-
-            <span class="info">Number of known words:
-                <span class="value">
-                {{book.n_known_words_unique}} / {{book.n_words_unique}}
-                ({{(book.n_known_words_unique / book.n_words_unique * 100)|int}}%)
-                </span>
-            </span>
-
-            <span class="info">Total number of (non-unique) known words:
-                <span class="value">
-                {{book.n_known_words_total}} / {{book.n_words}}
-                ({{(book.n_known_words_total / book.n_words * 100)|int}}%)
-                </span>
-            </span>
-
-
-
-            <h3 class="sub-title">Characters used</h3>
-            <span class="info">Number of unique characters used:
-                <span class="value">
-                {{book.n_chars_unique}}
-                </span>
-            </span>
-            <span class="info">Number of unique characters used only once:
-                <span class="value">
-                {{book.n_chars_used_once}}
-                </span>
-            </span>
-            <span class="info">Percentage of unique characters used only once:
-                <span class="value">
-                {{(book.n_chars_used_once / book.n_chars_unique * 100)|int}}%
-                </span>
-            </span>
-        </div>
-        </div>
-        <div class="button-container">
-            <button type="button">
-            <a href="/books/{{book.file_hash}}/plots">
-                See plots
-            </a>
-            </button>
-
-            <button type="button">
-                <a href="/api/books/{{book.file_hash}}">
-                See more details
-            </a>
-            </button>
-       </div>
-
-    </li>
-    {% endfor %}
+        {% for book in books %}
+        {% include 'basic-info.html' %}
+        {% include 'buttons.html' %}
+        {% endfor %}
     </ul>
-   </body>
+
+</body>
 </html>

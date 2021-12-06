@@ -29,7 +29,10 @@ def get_histogram(words: WordAnalysis, save_path: str) -> str:
             df = df.append({"Range":bins[get_bins(word['frequency']['netflix'].frequency,bins)],"Stars":word['frequency']['netflix'].stars},ignore_index=True)
 
     fig = px.histogram(df, 'Range',color='Range')
-    pio.write_html(fig, file=save_path)
+    fig.write_image(save_path)
+    # not doing html plots at the moment because
+    # it is kind of a pain to apply css to them
+    # pio.write_html(fig, file=save_path)
 
     return save_path
 
